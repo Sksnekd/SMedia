@@ -3,7 +3,10 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import myapp.models
+from django.db import migrations, models
+
+def upload_to(instance, filename):
+    return 'images/' + filename
 
 
 class Migration(migrations.Migration):
@@ -29,8 +32,10 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=80)),
                 ('description', models.TextField()),
-                ('image_url', models.ImageField(blank=True, null=True, upload_to=myapp.models.upload_to)),
-                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='listings', to=settings.AUTH_USER_MODEL)),
+                ('image_url', models.ImageField(blank=True, null=True, upload_to=upload_to)),
+                # Use the function directly here
+                ('creator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='listings',
+                                              to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from .views import UserRegistrationView
 from . import views
 
 urlpatterns = [
+    path('register/', UserRegistrationView.as_view()),
     path('posts/', views.PostListView.as_view(), name='post-list'),
     path('categories/', views.CategoryListView.as_view(), name='category-list'),
     path('posts/category/<int:category_id>/', views.PostListByCategory.as_view(), name='post-list-by-category'),

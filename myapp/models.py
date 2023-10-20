@@ -30,18 +30,6 @@ class MyUser(AbstractUser, PermissionsMixin):
         default=True,
         verbose_name='Активен'
     )
-    is_staff = models.BooleanField(
-        default=True,
-        verbose_name='Сотрудник'
-    )
-    is_admin = models.BooleanField(
-        default=False,
-        verbose_name='Админ'
-    )
-    is_caretaker = models.BooleanField(
-        default=False,
-        verbose_name='Волонтер'
-    )
     objects = MyUserManager()
 
     USERNAME_FIELD = 'username'
@@ -84,7 +72,7 @@ def upload_to(instance, filename):
 
 
 class UserImage(models.Model):
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="listings")
+    creator = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="listings")
     title = models.CharField(
         max_length=80, blank=False, null=False)
     description = models.TextField()
@@ -92,7 +80,7 @@ class UserImage(models.Model):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)

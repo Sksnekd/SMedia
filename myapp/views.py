@@ -2,7 +2,28 @@ from .models import UserImage, Post, Category, UserProfile
 from .serializers import (UserImageSerializer, PostSerializer, CategorySerializer, UserProfileSerializer, UserRegistrationSerializer)
 from rest_framework import permissions, viewsets, generics, status
 from rest_framework.parsers import MultiPartParser, FormParser
+
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework.generics import RetrieveDestroyAPIView
+
+class DeletePostDetailView(RetrieveDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAdminUser]
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            post = self.get_object()
+            if request.user.is_staff:
+                post.delete()
+                return Response({"message": "Post deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": "You do not have permission to delete this post"}, status=status.HTTP_403_FORBIDDEN)
+        except Post.DoesNotExist:
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -32,6 +53,8 @@ class UserImageViewSet(viewsets.ModelViewSet):
 class PostListView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'author', 'created_date', 'categories']
 
 
 class PostDetailView(generics.RetrieveAPIView):
